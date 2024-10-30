@@ -75,7 +75,6 @@ class Item(models.Model):
         ('right', 'Right'),
         ('na', 'N/A'),
     ]
-
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     item_name = models.CharField(max_length=100)

@@ -305,7 +305,7 @@ class EditProductView(View):
     template_name = 'edit_product.html'
 
     def get(self, request, product_id):
-        product = get_object_or_404(Product, id=product_id)
+        product = get_object_or_404(Product, product_id=product_id)
         form = EditProductForm(instance=product)
         return render(request, self.template_name, {
             'form': form,
@@ -314,7 +314,7 @@ class EditProductView(View):
         })
 
     def post(self, request, product_id):
-        product = get_object_or_404(Product, id=product_id)
+        product = get_object_or_404(Product, product_id=product_id)
         form = EditProductForm(request.POST, instance=product)
         if form.is_valid():
             form.save()
@@ -371,7 +371,7 @@ def delete_item(request, product_id):
 # Delete a recently purchased product
 class DeleteRecentlyPurchasedProductView(View):
     def post(self, request, product_id):
-        recently_purchased = get_object_or_404(RecentlyPurchasedProduct, id=product_id)
+        recently_purchased = get_object_or_404(RecentlyPurchasedProduct, product_id=product_id)
         recently_purchased.delete()
         messages.success(request, f"{recently_purchased.product.name} has been deleted from the recently purchased list.")
         return redirect('low_stock')

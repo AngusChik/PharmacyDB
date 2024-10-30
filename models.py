@@ -28,8 +28,7 @@ class AppCustomer(models.Model):
 class AppItem(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
-
+    
     class Meta:
         managed = False
         db_table = 'app_item'

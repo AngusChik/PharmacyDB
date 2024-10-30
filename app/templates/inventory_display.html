@@ -8,10 +8,10 @@
 <!-- Search form for barcode and name, with category filter -->
 <form id="barcodeForm" method="get" action="{% url 'inventory_display' %}">
     <label for="barcode-search">Search by Barcode:</label>
-    <input type="text" id="barcode-search" name="barcode_query" value="{{ barcode_query|default_if_none:'' }}" placeholder="Enter barcode...">
+    <input type="text" id="barcode-search" name="barcode_query" placeholder="Enter barcode...">
 
     <label for="name-search">Search by Name:</label>
-    <input type="text" id="name-search" name="name_query" value="{{ name_query|default_if_none:'' }}" placeholder="Enter product name...">
+    <input type="text" id="name-search" name="name_query" placeholder="Enter product name...">
     
     <label for="category-select">Filter by Category:</label>
     <select id="category-select" name="category_id">
@@ -22,9 +22,8 @@
         </option>
         {% endfor %}
     </select>
-    <a href="{% url 'new_product' %}" style="border-color:palevioletred; border: 1px; display: block; text-align: center; margin-top: 12px; margin-bottom: 5px; color: #007BFF; text-decoration: none;">Add New Product</a>
-
-    <button type="submit" style="margin-top: 5px;">Search</button>
+    
+    <button type="submit">Search</button>
 </form>
 
 <table>
@@ -60,7 +59,7 @@
     </tbody>
 </table>
 
-<div class="pagination" style="margin-top: 15px;">
+<div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
             <a href="?page=1{% if barcode_query %}&barcode_query={{ barcode_query }}{% endif %}{% if name_query %}&name_query={{ name_query }}{% endif %}">First</a>
@@ -82,40 +81,27 @@
     document.addEventListener('DOMContentLoaded', function() {
         const barcodeInput = document.getElementById('barcode-search');
         const nameInput = document.getElementById('name-search');
-        const form = document.getElementById('barcodeForm');
 
         // Focus on the barcode input when the page loads
         barcodeInput.focus();
 
-        // Function to clear input fields and refocus after 3 seconds
-        function clearAndRefocusAfterDelay() {
-            setTimeout(function() {
-                barcodeInput.value = "";  // Clear the barcode input
-                nameInput.value = "";     // Clear the name input
-                barcodeInput.focus();      // Refocus on the barcode input
-            }, 2000); // 2000 milliseconds = 3 seconds
-        }
-
         // Automatically submit the form when the barcode is entered
         barcodeInput.addEventListener('change', function() {
-            form.submit();
-            clearAndRefocusAfterDelay();
+            document.getElementById('barcodeForm').submit();
         });
 
         // Automatically submit the form when the name is entered
         nameInput.addEventListener('change', function() {
-            form.submit();
-            clearAndRefocusAfterDelay();
+            document.getElementById('barcodeForm').submit();
         });
 
-        // Additional refocusing after form submission if needed
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();  // Prevent multiple submissions
-            clearAndRefocusAfterDelay();
+        // Refocus the input field after form submission if necessary
+        document.getElementById('barcodeForm').addEventListener('submit', function() {
+            setTimeout(function() {
+                barcodeInput.focus();  // Refocus the input field for the next input
+            }, 100);  // Short delay to allow the form submission to complete
         });
     });
 </script>
-
-
 
 {% endblock %}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="../static/css/style1.css">
+
+    {% block extra_css %}{% endblock %}  <!-- Placeholder for page-specific CSS -->
+
+    <title>{% block title %}My Django App{% endblock %}</title>
+
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'inventory_display' %}">Inventory</a></li>
+            <li><a href="{% url 'create_order' %}">Purchase</a></li>
+            <li><a href="{% url 'checkin' %}">Check-in</a></li>
+            <li><a href="{% url 'low_stock' %}">Low Stock</a></li>
+            <li><a href="{% url 'order_view' %}">Transactions</a></li>
+            <li><a href="{% url 'item_list' %}">Special Orders</a></li>
+            <!-- add items to list-->
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% block content %}
+        <!-- Content will be injected here -->
+        {% endblock %}
+    </div>
+</body>
+</html>

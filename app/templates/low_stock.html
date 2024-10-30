@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Low Stock Products{% endblock %}
+
+{% block content %}
+
+<h1 style="margin-bottom: 10px;">Recently Purchased Products / Low Stock Products</h1>
+
+{% if page_obj_recent.object_list %}
+    <ul style="padding-left: 20px;">
+        {% for recent in page_obj_recent %}
+        <li style="margin-bottom: 2px;">
+            Brand: {{ recent.product.brand }} - 
+            <strong>{{ recent.product.name }}</strong> 
+            - (Barcode: {{ recent.product.barcode }})
+            <br>
+            <strong style="margin-bottom: 2px;">{{ recent.quantity }}</strong> unit(s) was purchased 
+            <form method="post" action="{% url 'delete_recently_purchased_product' recent.id %}" style="display:inline; margin: 2px 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn-small-delete" style="margin: 2px 0; padding: 4px 8px; width: 10px;">Delete</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No recent purchases.</p>
+{% endif %}
+
+
+<h1 style="margin-bottom: 10px;">Low Stock Products (&lt3)</h1>
+
+{% if page_obj_low_stock.object_list %}
+    <ul>
+        {% for product in page_obj_low_stock %}
+            <li>
+                Brand: {{product.brand}} - <strong>{{ product.name }}</strong> - (Barcode: {{ product.barcode }}) {{ product.quantity_in_stock }} left in stock
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No low stock products.</p>
+{% endif %}
+
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if barcode_query %}&barcode_query={{ barcode_query }}{% endif %}{% if selected_category_id %}&category_id={{ selected_category_id }}{% endif %}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if barcode_query %}&barcode_query={{ barcode_query }}{% endif %}{% if selected_category_id %}&category_id={{ selected_category_id }}{% endif %}">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if barcode_query %}&barcode_query={{ barcode_query }}{% endif %}{% if selected_category_id %}&category_id={{ selected_category_id }}{% endif %}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if barcode_query %}&barcode_query={{ barcode_query }}{% endif %}{% if selected_category_id %}&category_id={{ selected_category_id }}{% endif %}">Last</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}

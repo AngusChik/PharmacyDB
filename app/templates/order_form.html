@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Flex container for main content and instructions -->
+    <div style="display: flex; width: 100%;">
+
+        <!-- Main Content (Left side) -->
+        <div style="flex: 1; padding-right: 20px; width: 50%;">
+            <div style="padding: 20px; border-radius: 5px;">
+                {% if messages %}
+                <div class="alert alert-warning" style="font-size: 14px;">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <h2>Order {{ order.order_id }}</h2>
+                <form id="barcodeForm" method="post" class="mb-4" action="{% url 'create_order' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="barcode">Scan or Enter Barcode:</label>
+                        <input type="text" id="barcode" name="barcode" required><br>
+                        <input type="hidden" id="quantity" name="quantity" value="1">
+                    </div>
+                </form>
+                
+                <form method="post" action="{% url 'submit_order' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Submit Order</button>
+                </form>
+
+                <h3>Current Order Details</h3>
+                <ul class="list-group mb-4">
+                    {% for detail in order_details %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                {{ detail.quantity }} x {{ detail.product.name }}
+                                <br>
+                                <ul>Unit Price: <span style="font-size: 1.5rem;">${{ detail.product.price|floatformat:2 }}</span></ul>
+                                <ul>Barcode: {{ detail.product.barcode }}</ul>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <!-- Delete Button -->
+                                <form method="post" action="{% url 'delete_order_item' detail.od_id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            
+                                
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>Total Price After Tax (13%): ${{ total_price_after_tax|floatformat:2 }}</h4>
+                </div>
+            </div>
+        </div>
+
+
+    <!-- Instructions and Price Table (Right side) -->
+    <div style="flex: 1; margin-left: 20px;">
+        <!-- Instructions Box -->
+        <div style="border: 1px solid #000000; padding: 20px; border-radius: 5px; text-align: left; height: 125px; overflow: auto; margin-bottom: 20px;">
+            <h2>Instructions</h2>
+            <ol style="margin-bottom: 5px;">
+                <li>Please scan the products, and then input them into the till.</li>
+                <li>Medical equipment is not taxable! Please write them an insurance receipt if they have insurance.</li>
+                <li>Refer to the price list below for food - CLICK ON THE ONE THEY ARE BUYING.</li>
+            </ol>
+        </div>
+
+        <!-- Price List Table -->
+        <div style="overflow: auto;">
+            <table border="1" cellpadding="2" cellspacing="0" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Snacks</th>
+                        <th>Price + TAX</th>
+                        <th>Beverages</th>
+                        <th>Price + TAX</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <tr>
+                            <td class="clickable-item" data-name="Chocolate Bar" data-price="1.99" data-tax="true">Chocolate Bar</td>
+                            <td>$1.99</td>
+                            <td class="clickable-item" data-name="Pop Can" data-price="1.00" data-tax="false">Pop Can</td>
+                            <td>$1.00 (No Tax)</td>
+                        </tr>
+                        <tr>
+                            <td class="clickable-item" data-name="2-pack Chocolate bar" data-price="2.99" data-tax="true">2-pack Chocolate bar</td>
+                            <td>$2.99</td>
+                            <td class="clickable-item" data-name="Water 500mL" data-price="1.29" data-tax="true">Water 500mL</td>
+                            <td>$1.29</td>
+                        </tr>   
+                    <tr>
+                        <td class="clickable-item" data-name="Gum / Trident Vibes" data-price="1.99" data-tax="true">Gum / Trident Vibes</td>
+                        <td>$1.99 / $4.99</td>
+                        <td colspan="2" style="background-color: black;"></td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Cheez-Its" data-price="2.49" data-tax="true">Cheez-Its</td>
+                        <td>$2.49</td>
+                        <td class="clickable-item" data-name="Coconut Water" data-price="2.99" data-tax="true">Coconut Water</td>
+                        <td>$2.99</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Fisherman's Friend (snack / Multi)" data-price="2.99" data-tax="true">Fisherman's Friend (snack / Multi)</td>
+                        <td>$2.99 / $4.99</td>
+                        <td class="clickable-item" data-name="Distilled Water Jug" data-price="2.99" data-tax="false">Distilled Water Jug</td>
+                        <td>$2.99 (No Tax)</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Glosettes" data-price="2.99" data-tax="true">Glosettes (raisins, almonds)</td>
+                        <td>$2.99</td>
+                        <td class="clickable-item" data-name="Gatorade" data-price="2.99" data-tax="true">Gatorade</td>
+                        <td>$2.99</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Halls" data-price="1.99" data-tax="true">Halls</td>
+                        <td>$1.99</td>
+                        <td class="clickable-item" data-name="Juice Box" data-price="1.00" data-tax="false">Juice Box</td>
+                        <td>$1.00 (No Tax)</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="KIND Granola Bars" data-price="2.49" data-tax="true">KIND Granola Bars</td>
+                        <td>$2.49</td>
+                        <td class="clickable-item" data-name="Perrier 500mL" data-price="2.99" data-tax="true">Perrier 500mL</td>
+                        <td>$2.99</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Kinder Thin Bar" data-price="1.00" data-tax="false">Kinder Thin Bar</td>
+                        <td>$1.00 (No Tax)</td>
+                        <td class="clickable-item" data-name="San Pellegrino" data-price="1.99" data-tax="true">San Pellegrino</td>
+                        <td>$1.99</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="M&M Tube" data-price="1.99" data-tax="true">M&M Tube</td>
+                        <td>$1.99</td>
+                        <td class="clickable-item" data-name="Thirsty Buddha (330mL / 490mL)" data-price="2.99" data-tax="true">Thirsty Buddha (330mL / 490mL)</td>
+                        <td>$2.99 / $3.99</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Mentos Sticks" data-price="1.99" data-tax="true">Mentos Sticks</td>
+                        <td>$1.99</td>
+                        <td colspan="2" style="background-color: black;"></td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Oreo Minis" data-price="1.00" data-tax="false">Oreo Minis</td>
+                        <td>$1.00 (No Tax)</td>
+                        <td class="clickable-item" data-name="Ensure Can" data-price="2.00" data-tax="false">Ensure Can</td>
+                        <td>Ensure Can</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Peanuts / Peanuts Can" data-price="2.99" data-tax="true">Peanuts / Peanuts Can</td>
+                        <td>$2.99 / $4.99</td>
+                        <td class="clickable-item" data-name="Ensure, Boost, Glucerna (Individual Bottle)" data-price="3.00" data-tax="false">Ensure, Boost, Glucerna (Individual Bottle)</td>
+                        <td>$3.00 (No Tax)</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Reese Big Cup" data-price="1.49" data-tax="true">Reese Big Cup</td>
+                        <td>$1.49</td>
+                        <td class="clickable-item" data-name="Ensure, Boost, Glucerna (Pack of 6)" data-price="18.00" data-tax="false">Ensure, Boost, Glucerna (Pack of 6)</td>
+                        <td>$18.00 (No Tax)</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Skittles" data-price="1.99" data-tax="true">Skittles</td>
+                        <td>$1.99</td>
+                        <td class="clickable-item" data-name="PediaSure Can" data-price="3.00" data-tax="false">PediaSure Can</td>
+                        <td>$3.00 (No Tax)</td>
+                    </tr>
+                    <tr>
+                        <td class="clickable-item" data-name="Twizzlers" data-price="1.99" data-tax="true">Twizzlers</td>
+                        <td>$1.99</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </div>
+        </div>
+    </div>             
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const barcodeInput = document.getElementById('barcode');
+        barcodeInput.focus();  // Automatically focus on the barcode input field when the page loads
+
+        barcodeInput.addEventListener('change', function() {
+            document.getElementById('barcodeForm').submit();
+        });
+
+        // Refocus the input field after form submission
+        document.getElementById('barcodeForm').addEventListener('submit', function() {
+            setTimeout(function() {
+                barcodeInput.value = '';  // Clear the input field
+                barcodeInput.focus();  // Refocus the input field for the next input
+            }, 100);  // Short delay to allow the form submission to complete
+        });
+    });
+    </script>
+
+
+{% endblock %}

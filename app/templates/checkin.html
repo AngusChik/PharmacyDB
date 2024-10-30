@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Check-in - My Django App{% endblock %}
+
+{% block content %}
+<h1>Check-in</h1>
+<ol>
+    <li>Scan Product</li>
+    <li>If the product exists, it will be added, if not, please add as a product.</li>
+    <li>If you added one too many, please go to the inventory and edit the quantity-in-stock.</li>
+    <li>Do not rush scanning the items.</li>
+</ol>
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<form id="barcodeForm" method="post" action="{% url 'checkin' %}">
+    {% csrf_token %}
+    <label for="barcode">Barcode:</label>
+    <input type="text" id="barcode" name="barcode" required><br>
+</form>
+
+<form method="get" action="{% url 'new_product' %}">
+    <button type="submit">Add New Product</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const barcodeInput = document.getElementById('barcode');
+        barcodeInput.focus();  // Automatically focus on the barcode input field
+
+        // Submit the form when the barcode is entered
+        barcodeInput.addEventListener('change', function() {
+            document.getElementById('barcodeForm').submit();
+        });
+
+        // Refocus the input field after submission if needed
+        document.getElementById('barcodeForm').addEventListener('submit', function() {
+            setTimeout(function() {
+                barcodeInput.focus();  // Refocus the input field
+            }, 100);  // Short delay to allow the form to process first
+        });
+    });
+</script>
+{% endblock %}

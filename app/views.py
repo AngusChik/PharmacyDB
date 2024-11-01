@@ -10,7 +10,7 @@ from django.core.paginator import Paginator
 from django.core.cache import cache
 import time
 from .forms import  EditProductForm, OrderDetailForm, BarcodeForm, ItemForm, AddProductForm
-from .models import Item, Product, Category, Order, OrderDetail, Customer, RecentlyPurchasedProduct 
+from .models import Item, Product, Category, Order, OrderDetail, Customer, RecentlyPurchasedProduct
 
 # Home view
 def home(request):
@@ -142,7 +142,6 @@ class CreateOrderView(View):
             'total_price_after_tax': total_price_after_tax,
         })
 
-
 class SubmitOrderView(View):
     def post(self, request, *args, **kwargs):
         if 'order_id' in request.session:
@@ -166,7 +165,6 @@ class SubmitOrderView(View):
             del request.session['order_id']
 
             return redirect('create_order')
-
 
 def delete_order_item(request, item_id):
     # Fetch the order detail object by its id (od_id)
@@ -364,7 +362,7 @@ class LowStockView(View):
 
 # Delete a recently purchased product
 class DeleteRecentlyPurchasedProductView(View):
-    def post(self, request, recently_purchased_id):
+    def post(self, request, id):  # Use 'id' to match the model's primary key field name
         try:
             recently_purchased = RecentlyPurchasedProduct.objects.get(id=id)
             product_name = recently_purchased.product.name  # Capture the name before deletion
@@ -373,7 +371,6 @@ class DeleteRecentlyPurchasedProductView(View):
         except RecentlyPurchasedProduct.DoesNotExist:
             messages.error(request, "The selected product does not exist in the recently purchased list.")
         return redirect('low_stock')
-
 
 # Delete an item
 def delete_item(request, product_id):

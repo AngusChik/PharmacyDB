@@ -3,24 +3,36 @@
 {% block title %}Low Stock Products{% endblock %}
 
 {% block content %}
-
+{% if messages %}
+<div class="alert alert-warning" style="font-size: 14px;">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
 <h1 style="margin-bottom: 10px;">Recently Purchased Products / Low Stock Products</h1>
 
 {% if page_obj_recent.object_list %}
     <ul style="padding-left: 20px;">
         {% for recent in page_obj_recent %}
-        <li style="margin-bottom: 2px;">
-            Brand: {{ recent.product.brand }} - 
-            <strong>{{ recent.product.name }}</strong> 
-            - (Barcode: {{ recent.product.barcode }})
-            <br>
-            <strong style="margin-bottom: 2px;">{{ recent.quantity }}</strong> unit(s) was purchased 
-            <form method="post" action="{% url 'delete_recently_purchased_product' recent.id %}" style="display:inline; margin: 2px 0;">
-                {% csrf_token %}
-                <button type="submit" class="btn-small-delete" style="margin: 2px; padding: 4px 8px; width: 100px;">Delete</button>
-            </form>
-        </li>
-    {% endfor %}
+            {% if recent.product %}
+                <li style="margin-bottom: 10px;">
+                    <span>Brand: {{ recent.product.brand }} - </span>
+                    <strong>{{ recent.product.name }}</strong>
+                    <span> - (Barcode: {{ recent.product.barcode }})</span>
+                    <br>
+                    <span><strong>{{ recent.quantity }}</strong> unit(s) purchased</span>
+                    <form method="post" action="{% url 'delete_recently_purchased_product' recent.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-small-delete" style="margin: 2px; padding: 4px 8px; width: 100px;">Delete</button>
+                    </form>
+                </li>
+            {% else %}
+                <li style="margin-bottom: 10px;">
+                    <em>Product details not available.</em>
+                </li>
+            {% endif %}
+        {% endfor %}
     </ul>
 {% else %}
     <p>No recent purchases.</p>

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
@@ -14,7 +15,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-#inventory
+#Inventory
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)  # Explicit primary key
     name = models.CharField(max_length=200)
@@ -30,7 +31,7 @@ class Product(models.Model):
     def __str__(self):
         return self.name
  
-### Purchase -- update inventory 
+### Purchase - Update inventory 
 class Order(models.Model): # the order
     order_id = models.AutoField(primary_key=True)  # Explicit primary key
     #customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE) #FK
@@ -52,8 +53,9 @@ class OrderDetail(models.Model):
         return f"{self.quantity} x {self.product.name}"
 
 class RecentlyPurchasedProduct(models.Model):
+    id = models.AutoField(primary_key=True)  # Auto-increment primary key without default
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)  # Track the quantity purchased
+    quantity = models.IntegerField(default=0)
     order_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -68,18 +70,22 @@ class Item(models.Model):
         ('large', 'Large'),
         ('xlarge', 'X-Large'),
         ('xxlarge', 'XX-Large'),
+        ('na', 'N/A'),
+        ('Bathroom', 'Bathroom')
     ]
     
     SIDE_CHOICES = [
         ('left', 'Left'),
         ('right', 'Right'),
         ('na', 'N/A'),
+        ('Bathroom', 'Bathroom')
     ]
+    
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     item_name = models.CharField(max_length=100)
-    size = models.CharField(max_length=10, choices=SIZE_CHOICES)
-    side = models.CharField(max_length=5, choices=SIDE_CHOICES)
+    size = models.CharField(max_length=100, choices=SIZE_CHOICES)
+    side = models.CharField(max_length=100, choices=SIDE_CHOICES)
     item_number = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
     is_checked = models.BooleanField(default=False)

@@ -3,47 +3,75 @@
 {% block title %}Check-in - My Django App{% endblock %}
 
 {% block content %}
-<h1>Check-in</h1>
+<h1>Product Check-in</h1>
 <ol>
-    <li>Scan Product</li>
-    <li>If the product exists, it will be added, if not, please add as a product.</li>
-    <li>If you added one too many, please go to the inventory and edit the quantity-in-stock.</li>
-    <li>Do not rush scanning the items.</li>
+    <li>Scan the Product.</li>
+    <li>If the product exists, it will be added; otherwise, please add it as a new product.</li>
+    <li>If you've added too many, go to inventory and edit the quantity in stock.</li>
+    <li>Please scan the items one at a time to avoid errors.</li>
 </ol>
 
+<!-- Display success/error messages -->
 {% if messages %}
-    <ul class="messages">
+    <div class="alert-container">
         {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            <div class="alert {{ message.tags }}">{{ message }}</div>
         {% endfor %}
-    </ul>
+    </div>
 {% endif %}
 
+<!-- Form to scan product barcode -->
 <form id="barcodeForm" method="post" action="{% url 'checkin' %}">
     {% csrf_token %}
-    <label for="barcode">Barcode:</label>
-    <input type="text" id="barcode" name="barcode" required><br>
+    <label for="barcode">Enter Product Barcode:</label>
+    <input type="text" id="barcode" name="barcode" required autofocus>
+    <button type="submit" hidden>Submit</button>  <!-- Hidden button to allow form submission via Enter key -->
 </form>
 
-<form method="get" action="{% url 'new_product' %}">
-    <button type="submit">Add New Product</button>
+<!-- Button to add new products if needed -->
+<form method="get" action="{% url 'new_product' %}" style="margin-top: 15px;">
+    <button type="submit" class="btn btn-primary">Add New Product</button>
 </form>
 
+<!-- Display recently checked-in products with delete options -->
+<div style="margin-top: 20px;">
+    <h3>Recently Checked-in Products</h3>
+    {% if recent_checkins %}
+        <ul class="recent-checkins-list">
+            {% for checkin in recent_checkins %}
+                <li>
+                    <span>{{ checkin.quantity }} unit(s) of {{ checkin.product.name }} checked in on {{ checkin.checkin_date }}</span>
+                    <form method="post" action="{% url 'delete_recently_checkedin_product' checkin.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No recently checked-in products or check-in history is unavailable.</p>
+    {% endif %}
+</div>
+
+<!-- JavaScript to handle barcode input focus and form submission -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const barcodeInput = document.getElementById('barcode');
-        barcodeInput.focus();  // Automatically focus on the barcode input field
+        
+        // Automatically focus on the barcode input field on page load
+        barcodeInput.focus();
 
-        // Submit the form when the barcode is entered
+        // Submit the form when the barcode field is populated
         barcodeInput.addEventListener('change', function() {
             document.getElementById('barcodeForm').submit();
         });
 
-        // Refocus the input field after submission if needed
+        // Refocus the input field after form submission, if necessary
         document.getElementById('barcodeForm').addEventListener('submit', function() {
             setTimeout(function() {
-                barcodeInput.focus();  // Refocus the input field
-            }, 100);  // Short delay to allow the form to process first
+                barcodeInput.focus();
+                barcodeInput.select();  // Select the existing text to allow for quicker rescan
+            }, 100);  // Delay to allow form submission first
         });
     });
 </script>

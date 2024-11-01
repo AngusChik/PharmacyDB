@@ -3,7 +3,10 @@
 {% block title %}Inventory{% endblock %}
 
 {% block content %}
-<h2>Inventory</h2>
+<h1>Inventory</h1>
+<form method="get" action="{% url 'new_product' %}">
+    <button type="submit">Add New Product</button>
+</form>
 
 <!-- Search form for barcode and name, with category filter -->
 <form id="barcodeForm" method="get" action="{% url 'inventory_display' %}">
@@ -22,7 +25,6 @@
         </option>
         {% endfor %}
     </select>
-    
     <button type="submit">Search</button>
 </form>
 

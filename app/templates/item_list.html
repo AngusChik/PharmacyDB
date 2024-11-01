@@ -47,6 +47,8 @@
                         <option value="large">Large</option>
                         <option value="xlarge">X-Large</option>
                         <option value="xxlarge">XX-Large</option>
+                        <option value="N/A">N/A</option>
+                        <option value="N/A">Bathroom</option>
                     </select>
                 </div>
                 
@@ -57,6 +59,7 @@
                         <option value="left">Left</option>
                         <option value="right">Right</option>
                         <option value="na">N/A</option>
+                        <option value="N/A">Bathroom</option>
                     </select>
                 </div>
 
@@ -102,4 +105,28 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    // Set the inactivity timeout (in milliseconds)
+    let inactivityTime = 6000; // 10 seconds
+    let timeout;
+
+    function resetTimer() {
+        clearTimeout(timeout);
+        timeout = setTimeout(redirect, inactivityTime);
+    }
+
+    function redirect() {
+        window.location.href = "{% url 'create_order' %}";
+    }
+
+    // Reset timer on user interactions
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onscroll = resetTimer;
+    document.onclick = resetTimer;
+</script>
+
 {% endblock %}

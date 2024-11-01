@@ -165,8 +165,7 @@ class SubmitOrderView(View):
             # Clear the session to start a new order
             del request.session['order_id']
 
-            return redirect('order_success')  # Redirect to a success page
-        return redirect('create_order')
+            return redirect('create_order')
 
 
 def delete_order_item(request, item_id):
@@ -207,11 +206,13 @@ def delete_order_item(request, item_id):
 
 
 # View for order success page
+"""
 class OrderSuccessView(View):
     template_name = 'order_success.html'
     
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
+"""
 
 # Checkin product to inventory
 class CheckinProductView(View):
@@ -361,20 +362,25 @@ class LowStockView(View):
             'threshold': self.threshold,
         })
 
+# Delete a recently purchased product
+class DeleteRecentlyPurchasedProductView(View):
+    def post(self, request, recently_purchased_id):
+        try:
+            recently_purchased = RecentlyPurchasedProduct.objects.get(id=id)
+            product_name = recently_purchased.product.name  # Capture the name before deletion
+            recently_purchased.delete()
+            messages.success(request, f"{product_name} has been deleted from the recently purchased list.")
+        except RecentlyPurchasedProduct.DoesNotExist:
+            messages.error(request, "The selected product does not exist in the recently purchased list.")
+        return redirect('low_stock')
+
+
 # Delete an item
 def delete_item(request, product_id):
     product = get_object_or_404(Product, product_id=product_id)
     product.delete()
     messages.success(request, f"Product '{product.name}' has been deleted.")
     return redirect('inventory_display')
-
-# Delete a recently purchased product
-class DeleteRecentlyPurchasedProductView(View):
-    def post(self, request, product_id):
-        recently_purchased = get_object_or_404(RecentlyPurchasedProduct, product_id=product_id)
-        recently_purchased.delete()
-        messages.success(request, f"{recently_purchased.product.name} has been deleted from the recently purchased list.")
-        return redirect('low_stock')
 
 # Delete all orders
 class DeleteAllOrdersView(View):
